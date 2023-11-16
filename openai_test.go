@@ -18,7 +18,7 @@ type apiRequest struct {
 	Model string   `json:"model"`
 }
 
-func FetchEmbeddings(input []string, apiKey string) ([][]float32, error) {
+func FetchEmbeddings(input []string, apiKey string) ([][]float64, error) {
 	url := "https://api.openai.com/v1/embeddings"
 	data := &apiRequest{
 		Input: input,
@@ -55,11 +55,11 @@ func FetchEmbeddings(input []string, apiKey string) ([][]float32, error) {
 		return nil, err
 	}
 
-	var embeddings [][]float32
+	var embeddings [][]float64
 	for _, item := range result["data"].([]interface{}) {
-		var embedding []float32
+		var embedding []float64
 		for _, v := range item.(map[string]interface{})["embedding"].([]interface{}) {
-			embedding = append(embedding, float32(v.(float64)))
+			embedding = append(embedding, float64(v.(float64)))
 		}
 		embeddings = append(embeddings, embedding)
 	}

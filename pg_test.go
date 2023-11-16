@@ -20,9 +20,9 @@ type PgItem struct {
 
 func CreatePgItems(db *pg.DB) {
 	items := []PgItem{
-		PgItem{Embedding: pgvector.NewVector([]float32{1, 1, 1})},
-		PgItem{Embedding: pgvector.NewVector([]float32{2, 2, 2})},
-		PgItem{Embedding: pgvector.NewVector([]float32{1, 1, 2})},
+		PgItem{Embedding: pgvector.NewVector([]float64{1, 1, 1})},
+		PgItem{Embedding: pgvector.NewVector([]float64{2, 2, 2})},
+		PgItem{Embedding: pgvector.NewVector([]float64{1, 1, 2})},
 	}
 
 	for _, item := range items {
@@ -56,19 +56,19 @@ func TestPg(t *testing.T) {
 	CreatePgItems(db)
 
 	var items []PgItem
-	err = db.Model(&items).OrderExpr("embedding <-> ?", pgvector.NewVector([]float32{1, 1, 1})).Limit(5).Select()
+	err = db.Model(&items).OrderExpr("embedding <-> ?", pgvector.NewVector([]float64{1, 1, 1})).Limit(5).Select()
 	if err != nil {
 		panic(err)
 	}
 	if items[0].Id != 1 || items[1].Id != 3 || items[2].Id != 2 {
 		t.Errorf("Bad ids")
 	}
-	if !reflect.DeepEqual(items[1].Embedding.Slice(), []float32{1, 1, 2}) {
+	if !reflect.DeepEqual(items[1].Embedding.Slice(), []float64{1, 1, 2}) {
 		t.Errorf("Bad embedding")
 	}
 
 	var distances []float64
-	err = db.Model(&items).ColumnExpr("embedding <-> ?", pgvector.NewVector([]float32{1, 1, 1})).Order("id").Select(&distances)
+	err = db.Model(&items).ColumnExpr("embedding <-> ?", pgvector.NewVector([]float64{1, 1, 1})).Order("id").Select(&distances)
 	if err != nil {
 		panic(err)
 	}

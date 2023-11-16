@@ -17,9 +17,9 @@ type PgxItem struct {
 
 func CreatePgxItems(conn *pgx.Conn, ctx context.Context) {
 	items := []PgxItem{
-		PgxItem{Embedding: pgvector.NewVector([]float32{1, 1, 1})},
-		PgxItem{Embedding: pgvector.NewVector([]float32{2, 2, 2})},
-		PgxItem{Embedding: pgvector.NewVector([]float32{1, 1, 2})},
+		PgxItem{Embedding: pgvector.NewVector([]float64{1, 1, 1})},
+		PgxItem{Embedding: pgvector.NewVector([]float64{2, 2, 2})},
+		PgxItem{Embedding: pgvector.NewVector([]float64{1, 1, 2})},
 	}
 
 	for _, item := range items {
@@ -54,7 +54,7 @@ func TestPgx(t *testing.T) {
 
 	CreatePgxItems(conn, ctx)
 
-	rows, err := conn.Query(ctx, "SELECT *, embedding <-> $1 FROM pgx_items ORDER BY embedding <-> $1 LIMIT 5", pgvector.NewVector([]float32{1, 1, 1}))
+	rows, err := conn.Query(ctx, "SELECT *, embedding <-> $1 FROM pgx_items ORDER BY embedding <-> $1 LIMIT 5", pgvector.NewVector([]float64{1, 1, 1}))
 	if err != nil {
 		panic(err)
 	}
@@ -80,7 +80,7 @@ func TestPgx(t *testing.T) {
 	if items[0].Id != 1 || items[1].Id != 3 || items[2].Id != 2 {
 		t.Errorf("Bad ids")
 	}
-	if !reflect.DeepEqual(items[1].Embedding.Slice(), []float32{1, 1, 2}) {
+	if !reflect.DeepEqual(items[1].Embedding.Slice(), []float64{1, 1, 2}) {
 		t.Errorf("Bad embedding")
 	}
 	if distances[0] != 0 || distances[1] != 1 || distances[2] != math.Sqrt(3) {

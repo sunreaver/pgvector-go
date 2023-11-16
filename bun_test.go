@@ -35,9 +35,9 @@ func (*BunItem) AfterCreateTable(ctx context.Context, query *bun.CreateTableQuer
 
 func CreateBunItems(db *bun.DB, ctx context.Context) {
 	items := []BunItem{
-		BunItem{Embedding: pgvector.NewVector([]float32{1, 1, 1})},
-		BunItem{Embedding: pgvector.NewVector([]float32{2, 2, 2})},
-		BunItem{Embedding: pgvector.NewVector([]float32{1, 1, 2})},
+		BunItem{Embedding: pgvector.NewVector([]float64{1, 1, 1})},
+		BunItem{Embedding: pgvector.NewVector([]float64{2, 2, 2})},
+		BunItem{Embedding: pgvector.NewVector([]float64{1, 1, 2})},
 	}
 
 	_, err := db.NewInsert().Model(&items).Exec(ctx)
@@ -68,19 +68,19 @@ func TestBun(t *testing.T) {
 	CreateBunItems(db, ctx)
 
 	var items []BunItem
-	err = db.NewSelect().Model(&items).OrderExpr("embedding <-> ?", pgvector.NewVector([]float32{1, 1, 1})).Limit(5).Scan(ctx)
+	err = db.NewSelect().Model(&items).OrderExpr("embedding <-> ?", pgvector.NewVector([]float64{1, 1, 1})).Limit(5).Scan(ctx)
 	if err != nil {
 		panic(err)
 	}
 	if items[0].Id != 1 || items[1].Id != 3 || items[2].Id != 2 {
 		t.Errorf("Bad ids")
 	}
-	if !reflect.DeepEqual(items[1].Embedding.Slice(), []float32{1, 1, 2}) {
+	if !reflect.DeepEqual(items[1].Embedding.Slice(), []float64{1, 1, 2}) {
 		t.Errorf("Bad embedding")
 	}
 
 	var distances []float64
-	err = db.NewSelect().Model(&items).ColumnExpr("embedding <-> ?", pgvector.NewVector([]float32{1, 1, 1})).Order("id").Scan(ctx, &distances)
+	err = db.NewSelect().Model(&items).ColumnExpr("embedding <-> ?", pgvector.NewVector([]float64{1, 1, 1})).Order("id").Scan(ctx, &distances)
 	if err != nil {
 		panic(err)
 	}

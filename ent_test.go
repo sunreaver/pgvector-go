@@ -35,15 +35,15 @@ func TestEnt(t *testing.T) {
 		panic(err)
 	}
 
-	embedding := pgvector.NewVector([]float32{1, 1, 1})
+	embedding := pgvector.NewVector([]float64{1, 1, 1})
 	_, err = client.Item.Create().SetEmbedding(embedding).Save(ctx)
 	if err != nil {
 		panic(err)
 	}
 
 	_, err = client.Item.CreateBulk(
-		client.Item.Create().SetEmbedding(pgvector.NewVector([]float32{2, 2, 2})),
-		client.Item.Create().SetEmbedding(pgvector.NewVector([]float32{1, 1, 2})),
+		client.Item.Create().SetEmbedding(pgvector.NewVector([]float64{2, 2, 2})),
+		client.Item.Create().SetEmbedding(pgvector.NewVector([]float64{1, 1, 2})),
 	).Save(ctx)
 	if err != nil {
 		panic(err)
@@ -62,7 +62,7 @@ func TestEnt(t *testing.T) {
 	if items[0].ID != 1 || items[1].ID != 3 || items[2].ID != 2 {
 		t.Errorf("Bad ids")
 	}
-	if !reflect.DeepEqual(items[1].Embedding.Slice(), []float32{1, 1, 2}) {
+	if !reflect.DeepEqual(items[1].Embedding.Slice(), []float64{1, 1, 2}) {
 		t.Errorf("Bad embedding")
 	}
 }
